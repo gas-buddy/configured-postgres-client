@@ -6,10 +6,16 @@
   "scripts": {
     "test": "tap --node-arg=-r --node-arg=babel-register tests/*.js",
     "test-some": "tap --node-arg=-r --node-arg=babel-register",
-    "cover": "nyc --reporter=lcov npm test",
+    "cover": "cross-env BABEL_ENV=test nyc tap tests/test_*.js && nyc check-coverage $npm_package_config_coverage",
     "lint": "eslint .",
     "build": "babel src --out-dir build",
     "prepublish": "npm run build"
+  },
+  "config": {
+    "coverage": "--lines=70 --statements=70 --functions=60 --branches=40"
+  },
+  "bin": {
+    "run-pg-sql": "build/run-pg-sql.js"
   },
   "repository": {
     "type": "git",
@@ -25,12 +31,26 @@
     "babel-cli": "^6.4.5",
     "babel-preset-gasbuddy": "^1",
     "bluebird": "^3.2.1",
+    "cross-env": "^3.1.4",
     "eslint": "^3.1.0",
     "eslint-config-gasbuddy": "^1",
-    "tap": "^8.0.0",
+    "tap": "^10.0.0",
     "winston": "^2.3.0"
   },
   "dependencies": {
     "pg-promise": "^5.3.5"
+  },
+  "nyc": {
+    "include": [
+      "src"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "reporter": [
+      "lcov"
+    ]
   }
 }
