@@ -4,6 +4,10 @@ import pgp from 'pg-promise';
 let postgresClient;
 let usageCount = 0;
 
+function enc(s) {
+  return encodeURIComponent(s);
+}
+
 export default class PgClient {
   constructor(context, opts) {
     if (!postgresClient) {
@@ -17,7 +21,7 @@ export default class PgClient {
     assert(opts.database, 'configured-postgres-client missing database setting');
 
     const hostname = opts.port ? `${opts.hostname}:${opts.port}` : opts.hostname;
-    const url = `postgres://${opts.username}:${opts.password}@${hostname}/${opts.database}`;
+    const url = `postgres://${enc(opts.username)}:${enc(opts.password)}@${hostname}/${opts.database}`;
     if (context && context.logger && context.logger.info) {
       context.logger.info('Initializing postgres client', {
         user: opts.username,
