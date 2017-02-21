@@ -7,11 +7,13 @@ export default class TrackingClient {
 
   async run(method, args) {
     const callInfo = {
+      client: this.configuredClient,
       context: this.queryContext,
       operationName: this.operationName,
+      method,
       args,
     };
-    this.configuredClient.emit('start', method, callInfo);
+    this.configuredClient.emit('start', callInfo);
     try {
       const rz = await this.configuredClient.baseClient[method](...args);
       callInfo.result = rz;
@@ -19,7 +21,7 @@ export default class TrackingClient {
       return rz;
     } catch (error) {
       callInfo.error = error;
-      this.configuredClient.emit('error', method, callInfo);
+      this.configuredClient.emit('error', callInfo);
       throw error;
     }
   }
