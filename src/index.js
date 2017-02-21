@@ -1,5 +1,7 @@
 import assert from 'assert';
 import pgp from 'pg-promise';
+import { EventEmitter } from 'events';
+import TrackingClient from './trackingClient';
 
 let postgresClient;
 let usageCount = 0;
@@ -8,8 +10,36 @@ function enc(s) {
   return encodeURIComponent(s);
 }
 
-export default class PgClient {
+function createProxiedInterface(instance, context) {
+  const defaultQuery = new TrackingClient(instance, context, 'default');
+  const pgClient = {
+    query(...args) {
+      return instance.query(...args);
+    },
+    connect(...args) {
+      return instance.baseClient.connect(...args);
+    },
+  };
+  const methods = ['one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result'];
+  for (const m of methods) {
+    pgClient[m] = function defaultQueryFn(...args) {
+      if (context && context.logger && context.logger.warn) {
+        context.logger.warn(`pg method '${m}' called without query name. Use client.query(context, name).${m}(...)`, {
+          stack: new Error().stack,
+        });
+      }
+      if (!defaultQuery[m]) {
+        throw new Error(`Invalid query function: ${m}. Supported: ${Object.getOwnPropertyNames(defaultQuery)}`);
+      }
+      return defaultQuery[m](...args);
+    };
+  }
+  return pgClient;
+}
+
+export default class PgClient extends EventEmitter {
   constructor(context, opts) {
+    super();
     if (!postgresClient) {
       postgresClient = pgp();
     }
@@ -29,7 +59,9 @@ export default class PgClient {
         db: opts.database,
       });
     }
-    this.pgClient = postgresClient(url);
+
+    this.baseClient = postgresClient(url);
+    this.pgClient = createProxiedInterface(this, context);
     if (opts.interface) {
       this.interface = opts.interface.default || opts.interface;
     }
@@ -60,5 +92,13 @@ export default class PgClient {
       }
       usageCount = 0;
     }
+  }
+
+  /**
+   * Create a query proxy that has context and an operation name
+   * (useful in metrics tracking, for example)
+   */
+  query(queryContext, operationName) {
+    return new TrackingClient(this, queryContext, operationName);
   }
 }
