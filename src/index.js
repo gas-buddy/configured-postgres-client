@@ -10,11 +10,21 @@ function enc(s) {
   return encodeURIComponent(s);
 }
 
+/**
+ * The proxied pgclient interface will associate logging with the request that
+ * started it (for better distributed system tracing for example), as well
+ * as provide enough context to do proper metrics (eg Prometheus). The impact
+ * is that you should call "queryWithContext" first before issuing one of the
+ * supported commands: one, oneOrNone, many, manyOrNone, none, result
+ */
 function createProxiedInterface(instance, context) {
   const defaultQuery = new TrackingClient(instance, context, 'default');
   const pgClient = {
     query(...args) {
       return instance.query(...args);
+    },
+    queryWithContext(...args) {
+      return instance.queryWithContext(...args);
     },
     connect(...args) {
       return instance.baseClient.connect(...args);
@@ -103,7 +113,7 @@ export default class PgClient extends EventEmitter {
   }
 
   /**
-   * Use queryWithContext
+   * Use queryWithContext instead
    * @deprecated
    */
   query(queryContext, operationName) {
