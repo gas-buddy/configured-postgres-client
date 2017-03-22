@@ -5,6 +5,6 @@ configured-postgres-client
 [![wercker status](https://app.wercker.com/status/3bbed211529afb70894be073762d5552/s/master "wercker status")](https://app.wercker.com/project/byKey/3bbed211529afb70894be073762d5552)
 
 A small wrapper around pg/pg-promise to allow configuration from confit and
-tracking of start/finish/queryError on all queries.
+tracking of start/finish/error on all queries.
 
 Supports the following methods from pg-promise: connect, none, one, oneOrNone, many, manyOrNone, result
