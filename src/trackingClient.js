@@ -21,7 +21,7 @@ export default class TrackingClient {
       return rz;
     } catch (error) {
       callInfo.error = error;
-      this.configuredClient.emit('error', callInfo);
+      this.configuredClient.emit('queryError', callInfo);
       throw error;
     }
   }
