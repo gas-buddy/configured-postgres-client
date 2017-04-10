@@ -21,7 +21,11 @@ export default class TrackingClient {
       return rz;
     } catch (error) {
       callInfo.error = error;
-      this.configuredClient.emit('queryError', callInfo);
+      // Only emit this if someone is listening, because otherwise it
+      // prevents the throw of the original error
+      if (this.configuredClient.listenerCount('error')) {
+        this.configuredClient.emit('error', callInfo);
+      }
       throw error;
     }
   }
