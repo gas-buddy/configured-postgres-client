@@ -119,4 +119,11 @@ export default class PgClient extends EventEmitter {
   query(queryContext, operationName) {
     return this.queryWithContext(queryContext, operationName);
   }
+
+  /**
+   * Expose the pg-promise client for helpers
+   */
+  static pgp() {
+    return postgresClient;
+  }
 }
