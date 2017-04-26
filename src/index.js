@@ -30,7 +30,7 @@ function createProxiedInterface(instance, context) {
       return instance.baseClient.connect(...args);
     },
   };
-  const methods = ['one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result'];
+  const methods = ['one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result', 'tx'];
   for (const m of methods) {
     pgClient[m] = function defaultQueryFn(...args) {
       if (context && context.logger && context.logger.warn) {
