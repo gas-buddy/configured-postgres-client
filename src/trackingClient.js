@@ -57,4 +57,8 @@ export default class TrackingClient {
   async result(...args) {
     return this.run('result', args);
   }
+
+  async tx(...args) {
+    return this.run('tx', args);
+  }
 }
