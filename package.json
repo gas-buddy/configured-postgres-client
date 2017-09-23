@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-postgres-client",
-  "version": "2.1.5",
+  "version": "3.0.0",
   "description": "A configuration driven postgres client",
   "main": "build/index.js",
   "scripts": {
@@ -29,16 +29,15 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-gasbuddy": "^1",
+    "babel-preset-gasbuddy": "^2.6.0",
     "bluebird": "^3.2.1",
-    "cross-env": "^3.1.4",
-    "eslint": "^3.1.0",
-    "eslint-config-gasbuddy": "^1",
+    "cross-env": "^5.0.5",
+    "eslint-config-gasbuddy": "^4.0.0",
     "tap": "^10.0.0",
     "winston": "^2.3.0"
   },
   "dependencies": {
-    "pg-promise": "^5.3.5"
+    "pg-promise": "^6.9.0"
   },
   "nyc": {
     "include": [

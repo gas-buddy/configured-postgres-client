@@ -15,7 +15,11 @@ export default class TrackingClient {
     };
     this.configuredClient.emit('start', callInfo);
     try {
-      const rz = await this.configuredClient.baseClient[method](...args);
+      let client = this.configuredClient.baseClient;
+      if (this.useReadOnly && this.configuredClient.readonlyBaseClient) {
+        client = this.configuredClient.readonlyBaseClient;
+      }
+      const rz = await client[method](...args);
       callInfo.result = rz;
       this.configuredClient.emit('finish', callInfo);
       return rz;
@@ -64,5 +68,10 @@ export default class TrackingClient {
 
   async tx(...args) {
     return this.run('tx', args);
+  }
+
+  readOnly() {
+    this.useReadOnly = true;
+    return this;
   }
 }

@@ -47,6 +47,19 @@ function createProxiedInterface(instance, context) {
   return pgClient;
 }
 
+function roUrl(opts) {
+  // Allow config from readonly dictionary, fall back to regular opts
+  const {
+    hostname = opts.hostname,
+    port = opts.port,
+    username = opts.username,
+    password = opts.password,
+    database = opts.database,
+  } = opts.readonly;
+  const finalHost = port ? `${hostname}:${port}` : hostname;
+  return `postgres://${enc(username)}:${enc(password)}@${finalHost}/${database}`;
+}
+
 export default class PgClient extends EventEmitter {
   constructor(context, opts) {
     super();
@@ -71,6 +84,9 @@ export default class PgClient extends EventEmitter {
     }
 
     this.baseClient = postgresClient(url);
+    if (opts.readonly) {
+      this.readonlyBaseClient = postgresClient(roUrl(opts));
+    }
     this.pgClient = createProxiedInterface(this, context);
     if (opts.interface) {
       this.interface = opts.interface.default || opts.interface;
