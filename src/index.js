@@ -15,7 +15,7 @@ function enc(s) {
  * started it (for better distributed system tracing for example), as well
  * as provide enough context to do proper metrics (eg Prometheus). The impact
  * is that you should call "queryWithContext" first before issuing one of the
- * supported commands: one, oneOrNone, many, manyOrNone, none, result
+ * supported commands: one, oneOrNone, many, manyOrNone, none, result, tx, task
  */
 function createProxiedInterface(instance, context) {
   const defaultQuery = new TrackingClient(instance, context, 'default');
@@ -30,7 +30,7 @@ function createProxiedInterface(instance, context) {
       return instance.baseClient.connect(...args);
     },
   };
-  const methods = ['any', 'one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result', 'tx'];
+  const methods = ['any', 'one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result', 'tx', 'task'];
   for (const m of methods) {
     pgClient[m] = function defaultQueryFn(...args) {
       if (context && context.logger && context.logger.warn) {

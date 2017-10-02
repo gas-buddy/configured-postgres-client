@@ -70,6 +70,10 @@ export default class TrackingClient {
     return this.run('tx', args);
   }
 
+  async task(...args) {
+    return this.run('task', args);
+  }
+
   readOnly() {
     this.useReadOnly = true;
     return this;
