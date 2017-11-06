@@ -91,6 +91,13 @@ export default class PgClient extends EventEmitter {
     if (opts.interface) {
       this.interface = opts.interface.default || opts.interface;
     }
+    if (opts.sqlFilesDirectory) {
+      if (context && context.logger && context.logger.info) {
+        context.logger.info(`Creating SqlFiles for ${opts.sqlFilesDirectory}`);
+      }
+      this.sqlFiles = pgp.utils.enumSql(`${opts.sqlFilesDirectory}`, { recursive: true },
+        file => new pgp.QueryFile(file));
+    }
     this.options = Object.assign({}, opts);
     delete this.options.password;
   }
@@ -102,6 +109,9 @@ export default class PgClient extends EventEmitter {
       this.db = new (ClassConstructor)(this.pgClient, this.options);
     } else {
       this.db = this.pgClient;
+    }
+    if (this.sqlFiles) {
+      this.db.sqlFiles = this.sqlFiles;
     }
     usageCount += 1;
     return this.db;
