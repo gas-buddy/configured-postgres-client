@@ -19,14 +19,14 @@ tap.test('test_connection', async (t) => {
   t.end();
 });
 
-tap.test('test query files', async(t) => {
+tap.test('test query files', async (t) => {
   const config = {
     name: 'test-db',
     hostname: process.env.PGHOST,
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
     password: process.env.PGPASSWORD || '',
-    sqlFilesDirectory: '/data/tests/sqlFiles'
+    sqlFilesDirectory: '/data/tests/sqlFiles',
   };
   const pg = new PgClient(winston, config);
   const db = await pg.start();
@@ -35,5 +35,4 @@ tap.test('test query files', async(t) => {
   t.strictEquals(c.one, 1, 'Test query file should work.');
   await pg.stop();
   t.end();
-
 });
