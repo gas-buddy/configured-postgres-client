@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-postgres-client",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "A configuration driven postgres client",
   "main": "build/index.js",
   "scripts": {
