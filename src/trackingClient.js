@@ -74,8 +74,16 @@ export default class TrackingClient {
     return this.run('task', args);
   }
 
-  readOnly() {
-    this.useReadOnly = true;
+  /**
+   * If a read-only replica is configured for this client, use it.
+   * In order to allow parameterized control, you can pass false
+   * as the argument and we will NOT use a read only replica even if available.
+   * Any other value (undefined, for example) is the same as true.
+   * @param {boolean} ro If === false, do not use read only connection,
+   *  else use the read only connection
+   */
+  readOnly(ro: boolean) {
+    this.useReadOnly = ro !== false;
     return this;
   }
 }
