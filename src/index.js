@@ -124,7 +124,7 @@ export default class PgClient extends EventEmitter {
    * Create a query proxy that has context and an operation name
    * (useful in metrics tracking, for example)
    */
-  queryWithContext(queryContext, operationName) {
+  queryWithContext(queryContext, operationName: string) {
     return new TrackingClient(this, queryContext, operationName);
   }
 
@@ -132,7 +132,7 @@ export default class PgClient extends EventEmitter {
    * Use queryWithContext instead
    * @deprecated
    */
-  query(queryContext, operationName) {
+  query(queryContext, operationName: string) {
     return this.queryWithContext(queryContext, operationName);
   }
 
