@@ -26,7 +26,7 @@ tap.test('test query files', async (t) => {
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
     password: process.env.PGPASSWORD || '',
-    sqlFilesDirectory: '/data/tests/sqlFiles',
+    sqlFilesDirectory: `${__dirname}/sqlFiles`,
   };
   const pg = new PgClient(winston, config);
   const db = await pg.start();
