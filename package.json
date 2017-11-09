@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-postgres-client",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "A configuration driven postgres client",
   "main": "build/index.js",
   "scripts": {
@@ -9,13 +9,16 @@
     "cover": "cross-env BABEL_ENV=test nyc tap tests/test_*.js && nyc check-coverage $npm_package_config_coverage",
     "lint": "eslint .",
     "build": "babel src --out-dir build",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "config": {
     "coverage": "--lines=70 --statements=70 --functions=60 --branches=40"
   },
   "bin": {
     "run-pg-sql": "build/run-pg-sql.js"
+  },
+  "engines": {
+    "node": ">=8.9"
   },
   "repository": {
     "type": "git",
@@ -29,11 +32,11 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-gasbuddy": "^2.6.0",
+    "babel-preset-gasbuddy": "^3.1.0",
     "bluebird": "^3.5.1",
     "cross-env": "^5.1.1",
     "eslint-config-gasbuddy": "^4.0.0",
-    "tap": "^10.0.0",
+    "tap": "^10.7.3",
     "winston": "^2.4.0"
   },
   "dependencies": {
