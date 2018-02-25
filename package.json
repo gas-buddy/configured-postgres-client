@@ -40,7 +40,7 @@
     "winston": "^2.4.0"
   },
   "dependencies": {
-    "pg-promise": "^7.3.1"
+    "pg-promise": "^8.0.0"
   },
   "nyc": {
     "include": [
