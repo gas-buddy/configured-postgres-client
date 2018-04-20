@@ -135,6 +135,12 @@ export default class PgClient extends EventEmitter {
    * (useful in metrics tracking, for example)
    */
   queryWithContext(queryContext, operationName: string) {
+    if (this.options.logQueries && queryContext && queryContext.gb
+        && queryContext.gb.logger && queryContext.gb.logger.info) {
+      queryContext.gb.logger.info('pgq', {
+        operationName,
+      });
+    }
     return new TrackingClient(this, queryContext, operationName);
   }
 
