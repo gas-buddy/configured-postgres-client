@@ -6,6 +6,8 @@ export default class TrackingClient {
   }
 
   async run(method, args) {
+    const callSite = new Error();
+    Error.captureStackTrace(callSite, this.run);
     const callInfo = {
       client: this.configuredClient,
       context: this.queryContext,
@@ -30,7 +32,9 @@ export default class TrackingClient {
       if (this.configuredClient.listenerCount('error')) {
         this.configuredClient.emit('error', callInfo);
       }
-      throw error;
+      callSite.message = error.message;
+      Object.assign(callSite, error);
+      throw callSite;
     }
   }
 
