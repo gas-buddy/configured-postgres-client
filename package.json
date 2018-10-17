@@ -32,7 +32,7 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-gasbuddy": "^3.3.3",
+    "babel-preset-gasbuddy": "^4.0.0",
     "bluebird": "^3.5.1",
     "cross-env": "^5.1.4",
     "eslint-config-gasbuddy": "^4.1.0",
