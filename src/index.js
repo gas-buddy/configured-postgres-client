@@ -102,11 +102,11 @@ export default class PgClient extends EventEmitter {
     delete this.options.password;
   }
 
-  start() {
+  start(context) {
     assert(!this.db, 'start called multiple times on configured-postgres-client instance');
     if (this.interface) {
       const ClassConstructor = this.interface;
-      this.db = new (ClassConstructor)(this.pgClient, this.options);
+      this.db = new (ClassConstructor)(this.pgClient, this.options, context);
     } else {
       this.db = this.pgClient;
     }
