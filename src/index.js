@@ -107,6 +107,9 @@ export default class PgClient extends EventEmitter {
     if (this.interface) {
       const ClassConstructor = this.interface;
       this.db = new (ClassConstructor)(this.pgClient, this.options, context);
+      if (typeof this.db.start === 'function') {
+        return this.db.start(context);
+      }
     } else {
       this.db = this.pgClient;
     }
@@ -117,8 +120,11 @@ export default class PgClient extends EventEmitter {
     return this.db;
   }
 
-  stop() {
+  async stop(...args) {
     assert(this.db, 'stop called multiple times on configured-postgres-client instance');
+    if (typeof this.db.stop === 'function') {
+      await this.db.stop(...args);
+    }
     delete this.db;
     usageCount -= 1;
     if (usageCount <= 0) {
