@@ -39,7 +39,7 @@
     "tap": "^12.5.3"
   },
   "dependencies": {
-    "pg-promise": "^8.5.6"
+    "pg-promise": "^9.0.0"
   },
   "nyc": {
     "include": [
