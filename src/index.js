@@ -122,6 +122,7 @@ export default class PgClient extends EventEmitter {
 
   async stop(...args) {
     assert(this.db, 'stop called multiple times on configured-postgres-client instance');
+    this.emit('stop');
     if (typeof this.db.stop === 'function') {
       await this.db.stop(...args);
     }
