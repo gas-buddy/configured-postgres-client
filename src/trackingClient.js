@@ -105,6 +105,13 @@ export default class TrackingClient {
   }
 
   /**
+   * Whether or not a R/O replica is configured
+   */
+  get hasReadOnly() {
+    return !!this.configuredClient.readonlyBaseClient;
+  }
+
+  /**
    * Execute a function with a lock. The lock is unique across processes and within the current process as well
    * since it holds a connection from the pool so long as it is running. Throws an exception if it cannot get the lock
    * after timeout
