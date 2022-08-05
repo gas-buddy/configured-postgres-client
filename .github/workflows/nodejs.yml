@@ -1,0 +1,44 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:12-alpine
+        env:
+          POSTGRES_PASSWORD=postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, lint, build, and test
+      run: |
+        npm install
+        npm run lint
+        npm run build
+        npm test
+      env:
+        CI: true
