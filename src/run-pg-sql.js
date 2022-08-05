@@ -22,7 +22,10 @@ const connection = client({
   password: PGPASSWORD,
 });
 
-console.log(sql);
+if (!process.argv.find(s => s === '--quiet' || s === '-q')) {
+  console.log(sql);
+}
+
 connection.none(sql)
   .then(() => {
     console.log('Query completed.');
