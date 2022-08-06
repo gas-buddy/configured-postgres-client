@@ -7,7 +7,7 @@ tap.test('test_connection', async (t) => {
     hostname: process.env.PGHOST,
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || '',
+    password: process.env.PGPASSWORD || 'postgres',
   };
   const pg = new PgClient({ logger: console }, config);
   const db = await pg.start();
@@ -24,7 +24,7 @@ tap.test('test query files', async (t) => {
     hostname: process.env.PGHOST,
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || '',
+    password: process.env.PGPASSWORD || 'postgres',
     sqlFilesDirectory: `${__dirname}/sqlFiles`,
   };
   const pg = new PgClient({ logger: console }, config);

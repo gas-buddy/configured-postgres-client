@@ -9,7 +9,7 @@ tap.test('test_locking', async (t) => {
     hostname: process.env.PGHOST,
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || '',
+    password: process.env.PGPASSWORD || 'postgres',
   };
   const pg = new PgClient(context, config);
   const db = await pg.start();
