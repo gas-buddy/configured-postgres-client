@@ -4,8 +4,14 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
 
     services:
       postgres:
@@ -29,12 +35,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: npm install, lint, build, and test
-      env:
-        CI: true
-        PGHOST: localhost
-        PGPORT: 5432
-        PGUSER: postgres
-        PGPASSWORD: postgres
       run: |
         npm install
         npm run lint
