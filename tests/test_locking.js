@@ -1,18 +1,18 @@
-import tap from 'tap';
-import PgClient from '../src/index';
+const tap = require('tap');
+const PgClient = require('../build/index').default;
 
 const context = { logger: console };
 
 tap.test('test_locking', async (t) => {
   const config = {
     name: 'test-db',
-    hostname: process.env.PGHOST,
+    hostname: process.env.PGHOST || 'localhost',
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
     password: process.env.PGPASSWORD || 'postgres',
   };
   const pg = new PgClient(context, config);
-  const db = await pg.start();
+  const db = await pg.start(context);
 
   let doneWithFirst;
   const firstLockPromise = db.queryWithContext(context, 'first-lock')
@@ -36,9 +36,9 @@ tap.test('test_locking', async (t) => {
         }, { immediate: true })
         .catch(e => e);
       thirdLockPromise = db.queryWithContext(context, 'third-lock')
-        .tryAdvisoryLock('test key', async ({ retryCount } = {}) => {
+        .tryAdvisoryLock('test key', async (options = {}) => {
           t.ok(true, 'Should have acquired third lock.');
-          return retryCount;
+          return options.retryCount;
         }, [2000]);
       accept();
     }, 50);

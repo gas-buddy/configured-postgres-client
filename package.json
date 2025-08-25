@@ -3,12 +3,16 @@
   "version": "8.2.0",
   "description": "A configuration driven postgres client",
   "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "test": "tap --no-coverage --node-arg=-r --node-arg=@babel/register tests/*.js",
+    "test": "npm run build && tap --no-coverage tests/*.js",
     "test-some": "tap --node-arg=-r --node-arg=@babel/register",
-    "cover": "cross-env BABEL_ENV=test tap tests/test_*.js",
+    "cover": "npm run build && cross-env BABEL_ENV=test tap tests/test_*.js",
     "lint": "eslint .",
-    "build": "babel src --out-dir build",
+    "build": "tsc",
+    "build:babel": "babel src --out-dir build",
+    "build:watch": "tsc --watch",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "config": {
@@ -33,10 +37,14 @@
   "devDependencies": {
     "@babel/cli": "^7.18.10",
     "@babel/register": "^7.18.9",
+    "@types/node": "^20.0.0",
+    "@types/tap": "^15.0.0",
     "babel-preset-gasbuddy": "^6.0.0",
     "cross-env": "^7.0.3",
     "eslint-config-gasbuddy": "^5.3.0",
-    "tap": "^15.2.3"
+    "tap": "^15.2.3",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
     "pg-promise": "^10.11.1"

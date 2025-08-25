@@ -1,12 +1,48 @@
 import assert from 'assert';
-import pgp from 'pg-promise';
+import pgp, { IMain, IDatabase } from 'pg-promise';
 import { EventEmitter } from 'events';
 import TrackingClient from './trackingClient';
+import type { QueryContext, Logger } from './types';
 
-let postgresClient;
+type Context = QueryContext;
+
+interface DatabaseOptions {
+  username: string;
+  password: string;
+  hostname: string;
+  database: string;
+  port?: number;
+  readonly?: {
+    hostname?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+    database?: string;
+  };
+  interface?: any;
+  sqlFilesDirectory?: string;
+  logQueries?: boolean;
+}
+
+interface ProxiedPgClient {
+  query(...args: any[]): any;
+  queryWithContext(...args: any[]): any;
+  connect(...args: any[]): any;
+  any(...args: any[]): any;
+  one(...args: any[]): any;
+  oneOrNone(...args: any[]): any;
+  many(...args: any[]): any;
+  manyOrNone(...args: any[]): any;
+  none(...args: any[]): any;
+  result(...args: any[]): any;
+  tx(...args: any[]): any;
+  task(...args: any[]): any;
+}
+
+let postgresClient: IMain | null = null;
 let usageCount = 0;
 
-function enc(s) {
+function enc(s: string): string {
   return encodeURIComponent(s);
 }
 
@@ -17,37 +53,38 @@ function enc(s) {
  * is that you should call "queryWithContext" first before issuing one of the
  * supported commands: one, oneOrNone, many, manyOrNone, none, result, tx, task
  */
-function createProxiedInterface(instance, context) {
-  const defaultQuery = new TrackingClient(instance, context, 'default');
-  const pgClient = {
-    query(...args) {
-      return instance.query(...args);
+function createProxiedInterface(instance: PgClient, context: Context): ProxiedPgClient {
+  const defaultQuery = new TrackingClient(instance as any, context, 'default');
+  const pgClient: any = {
+    query(...args: any[]) {
+      return (instance as any).query(...args);
     },
-    queryWithContext(...args) {
-      return instance.queryWithContext(...args);
+    queryWithContext(...args: any[]) {
+      return (instance as any).queryWithContext(...args);
     },
-    connect(...args) {
-      return instance.baseClient.connect(...args);
+    connect(...args: any[]) {
+      return (instance.baseClient as any).connect(...args);
     },
   };
-  const methods = ['any', 'one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result', 'tx', 'task'];
+  
+  const methods: (keyof ProxiedPgClient)[] = ['any', 'one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result', 'tx', 'task'];
   for (const m of methods) {
-    pgClient[m] = function defaultQueryFn(...args) {
+    (pgClient as any)[m] = function defaultQueryFn(...args: any[]) {
       if (context && context.logger && context.logger.warn) {
         context.logger.warn(`pg method '${m}' called without query name. Use client.query(context, name).${m}(...)`, {
           stack: new Error().stack,
         });
       }
-      if (!defaultQuery[m]) {
+      if (!(defaultQuery as any)[m]) {
         throw new Error(`Invalid query function: ${m}. Supported: ${Object.getOwnPropertyNames(defaultQuery)}`);
       }
-      return defaultQuery[m](...args);
+      return (defaultQuery as any)[m].apply(defaultQuery, args);
     };
   }
   return pgClient;
 }
 
-function roUrl(opts) {
+function roUrl(opts: DatabaseOptions): string {
   // Allow config from readonly dictionary, fall back to regular opts
   const {
     hostname = opts.hostname,
@@ -55,13 +92,21 @@ function roUrl(opts) {
     username = opts.username,
     password = opts.password,
     database = opts.database,
-  } = opts.readonly;
+  } = opts.readonly || {};
   const finalHost = port ? `${hostname}:${port}` : hostname;
   return `postgres://${enc(username)}:${enc(password)}@${finalHost}/${database}`;
 }
 
 export default class PgClient extends EventEmitter {
-  constructor(context, opts) {
+  public baseClient: IDatabase<any>;
+  public readonlyBaseClient?: IDatabase<any>;
+  public pgClient: ProxiedPgClient;
+  public interface?: any;
+  public sqlFiles?: any;
+  public db?: any;
+  public options: Omit<DatabaseOptions, 'password'>;
+
+  constructor(context: Context, opts: DatabaseOptions) {
     super();
     if (!postgresClient) {
       postgresClient = pgp();
@@ -83,9 +128,9 @@ export default class PgClient extends EventEmitter {
       });
     }
 
-    this.baseClient = postgresClient(url);
+    this.baseClient = postgresClient!(url);
     if (opts.readonly) {
-      this.readonlyBaseClient = postgresClient(roUrl(opts));
+      this.readonlyBaseClient = postgresClient!(roUrl(opts));
     }
     this.pgClient = createProxiedInterface(this, context);
     if (opts.interface) {
@@ -95,18 +140,18 @@ export default class PgClient extends EventEmitter {
       if (context && context.logger && context.logger.info) {
         context.logger.info(`Creating SqlFiles for ${opts.sqlFilesDirectory}`);
       }
-      this.sqlFiles = pgp.utils.enumSql(`${opts.sqlFilesDirectory}`, { recursive: true },
-        file => new pgp.QueryFile(file));
+      this.sqlFiles = (pgp as any).utils.enumSql(`${opts.sqlFilesDirectory}`, { recursive: true },
+        (file: string) => new (pgp as any).QueryFile(file));
     }
     this.options = Object.assign({}, opts);
-    delete this.options.password;
+    delete (this.options as any).password;
   }
 
-  start(context) {
+  start(context: Context): any {
     assert(!this.db, 'start called multiple times on configured-postgres-client instance');
     if (this.interface) {
       const ClassConstructor = this.interface;
-      this.db = new (ClassConstructor)(this.pgClient, this.options, context);
+      this.db = new ClassConstructor(this.pgClient, this.options, context);
       if (typeof this.db.start === 'function') {
         return this.db.start(context);
       }
@@ -120,7 +165,7 @@ export default class PgClient extends EventEmitter {
     return this.db;
   }
 
-  async stop(...args) {
+  async stop(...args: any[]): Promise<void> {
     assert(this.db, 'stop called multiple times on configured-postgres-client instance');
     this.emit('stop');
     if (typeof this.db.stop === 'function') {
@@ -141,28 +186,28 @@ export default class PgClient extends EventEmitter {
    * Create a query proxy that has context and an operation name
    * (useful in metrics tracking, for example)
    */
-  queryWithContext(queryContext, operationName: string) {
+  queryWithContext(queryContext: Context, operationName: string): TrackingClient {
     if (this.options.logQueries && queryContext && queryContext.gb
         && queryContext.gb.logger && queryContext.gb.logger.info) {
       queryContext.gb.logger.info('pgq', {
         operationName,
       });
     }
-    return new TrackingClient(this, queryContext, operationName);
+    return new TrackingClient(this as any, queryContext, operationName);
   }
 
   /**
    * Use queryWithContext instead
    * @deprecated
    */
-  query(queryContext, operationName: string) {
+  query(queryContext: Context, operationName: string): TrackingClient {
     return this.queryWithContext(queryContext, operationName);
   }
 
   /**
    * Expose the pg-promise client for helpers
    */
-  static pgp() {
+  static pgp(): IMain | null {
     return postgresClient;
   }
 }

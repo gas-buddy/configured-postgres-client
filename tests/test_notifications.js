@@ -1,18 +1,18 @@
-import tap from 'tap';
-import PgClient from '../src/index';
+const tap = require('tap');
+const PgClient = require('../build/index').default;
 
 const context = { logger: console };
 
 tap.test('test_notifications', async (t) => {
   const config = {
     name: 'test-db',
-    hostname: process.env.PGHOST,
+    hostname: process.env.PGHOST || 'localhost',
     database: process.env.PGDATABASE || process.env.PGUSER || 'postgres',
     username: process.env.PGUSER || 'postgres',
     password: process.env.PGPASSWORD || 'postgres',
   };
   const pg = new PgClient(context, config);
-  const db = await pg.start();
+  const db = await pg.start(context);
 
   let promiseCompleter;
   const payloads = [];
