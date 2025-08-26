@@ -5,18 +5,16 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "test": "npm run build && tap --no-coverage tests/*.js",
-    "test-some": "tap --node-arg=-r --node-arg=@babel/register",
-    "cover": "npm run build && cross-env BABEL_ENV=test tap tests/test_*.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose",
     "lint": "eslint .",
     "build": "tsc",
     "build:babel": "babel src --out-dir build",
     "build:watch": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
-  },
-  "config": {
-    "coverage": "--lines=70 --statements=70 --functions=60 --branches=40"
   },
   "bin": {
     "run-pg-sql": "build/run-pg-sql.js"
@@ -38,27 +36,16 @@
     "@babel/cli": "^7.18.10",
     "@babel/register": "^7.18.9",
     "@types/node": "^20.0.0",
-    "@types/tap": "^15.0.0",
+    "@types/jest": "^29.0.0",
     "babel-preset-gasbuddy": "^6.0.0",
     "cross-env": "^7.0.3",
     "eslint-config-gasbuddy": "^5.3.0",
-    "tap": "^15.2.3",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
     "pg-promise": "^10.11.1"
-  },
-  "nyc": {
-    "include": [
-      "src"
-    ],
-    "require": [
-      "@babel/register"
-    ],
-    "sourceMap": false,
-    "reporter": [
-      "lcov"
-    ]
   }
 }

@@ -7,10 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build**: `npm run build` - Compiles TypeScript source to CommonJS in `build/` directory
 - **Build (watch)**: `npm run build:watch` - Compiles TypeScript in watch mode
 - **Type check**: `npm run typecheck` - Run TypeScript type checking without emitting files
-- **Test**: `npm test` - Runs all TypeScript tests with tap (no coverage)
-- **Test (legacy JS)**: `npm run test-js` - Run legacy JavaScript tests
-- **Test specific files**: `npm run test-some tests/test_*.ts` - Run specific test files
-- **Coverage**: `npm run cover` - Run tests with coverage analysis
+- **Test**: `npm test` - Runs all tests with Jest
+- **Test (watch)**: `npm run test:watch` - Run tests in watch mode
+- **Test (coverage)**: `npm run test:coverage` - Run tests with coverage analysis
+- **Test (verbose)**: `npm run test:verbose` - Run tests with detailed output
 - **Lint**: `npm run lint` - Run ESLint on all files
 - **Prepare for publish**: `npm run prepublishOnly` - Builds the project before publishing
 
@@ -55,11 +55,23 @@ Becomes: `client.sqlFiles.feature.getById`
 
 ## Testing
 
-Tests require PostgreSQL connection via environment variables:
+**Framework**: Jest with ts-jest preset for direct TypeScript compilation
+
+**Test Structure**: 
+- `tests/*.test.ts` - TypeScript Jest test files with full type safety
+- Direct imports from TypeScript source (`../src/index`) 
+- No build step required - ts-jest compiles TypeScript on-the-fly during testing
+- Proper setup/teardown for database connections with typed interfaces
+- Organized by feature: connection, locking, notifications
+- Type-safe test configurations and payload interfaces
+
+**Database Requirements**: Tests require PostgreSQL connection via environment variables:
 - `PGHOST` - PostgreSQL host
 - `PGUSER` - Username (defaults to 'postgres')  
 - `PGPASSWORD` - Password (defaults to 'postgres')
 - `PGDATABASE` - Database name (defaults to PGUSER or 'postgres')
+
+**Coverage**: Configured with 70% line coverage, 60% function coverage, 40% branch coverage
 
 ## Build System
 
