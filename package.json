@@ -10,7 +10,7 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "lint": "eslint .",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"

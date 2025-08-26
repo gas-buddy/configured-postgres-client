@@ -34,7 +34,7 @@ const connection = client({
   password: PGPASSWORD,
 });
 
-if (!process.argv.find(s => s === '--quiet' || s === '-q')) {
+if (!process.argv.find((s) => s === '--quiet' || s === '-q')) {
   console.log(sql);
 }
 

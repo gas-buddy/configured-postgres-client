@@ -78,9 +78,8 @@ Becomes: `client.sqlFiles.feature.getById`
 - **TypeScript**: Full TypeScript conversion completed with strict type checking
 - **Source**: TypeScript files in `src/`, compiled output in `build/`
 - **Type Definitions**: Generates `.d.ts` files for full IDE support
-- **Compilation**: ES2020 target, CommonJS modules
-- **Legacy Support**: Babel configuration maintained for backwards compatibility
-- **ESLint**: Uses `eslint-config-gasbuddy` rules
+- **Compilation**: ES2020 target, CommonJS modules via TypeScript compiler
+- **ESLint**: Uses `eslint-config-gasbuddy` rules with TypeScript support
 
 ## TypeScript Features
 

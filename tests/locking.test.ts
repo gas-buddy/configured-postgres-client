@@ -46,7 +46,9 @@ describe('Advisory Locking', () => {
     const firstLockPromise = db.queryWithContext(context, 'first-lock')
       .withAdvisoryLock('test key', async () => {
         expect(true).toBe(true); // Should acquire first lock
-        await new Promise<void>(resolve => setTimeout(resolve, 1500));
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 1500);
+        });
         doneWithFirst = true;
         return true;
       });
@@ -56,7 +58,8 @@ describe('Advisory Locking', () => {
 
     await new Promise<void>((resolve) => {
       setTimeout(() => {
-        expect(doneWithFirst).toBe(false); // Should have tried second lock acquire before first was done
+        // Should have tried second lock acquire before first was done
+        expect(doneWithFirst).toBe(false);
 
         secondLockPromise = db.queryWithContext(context, 'second-lock')
           .withAdvisoryLock('test key', async () => {

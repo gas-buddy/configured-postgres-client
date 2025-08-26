@@ -2,7 +2,7 @@ import assert from 'assert';
 import pgp, { IMain, IDatabase } from 'pg-promise';
 import { EventEmitter } from 'events';
 import TrackingClient from './trackingClient';
-import type { QueryContext, Logger } from './types';
+import type { QueryContext } from './types';
 
 type Context = QueryContext;
 
@@ -66,9 +66,9 @@ function createProxiedInterface(instance: PgClient, context: Context): ProxiedPg
       return (instance.baseClient as any).connect(...args);
     },
   };
-  
+
   const methods: (keyof ProxiedPgClient)[] = ['any', 'one', 'oneOrNone', 'many', 'manyOrNone', 'none', 'result', 'tx', 'task'];
-  for (const m of methods) {
+  methods.forEach((m) => {
     (pgClient as any)[m] = function defaultQueryFn(...args: any[]) {
       if (context && context.logger && context.logger.warn) {
         context.logger.warn(`pg method '${m}' called without query name. Use client.query(context, name).${m}(...)`, {
@@ -80,7 +80,7 @@ function createProxiedInterface(instance: PgClient, context: Context): ProxiedPg
       }
       return (defaultQuery as any)[m].apply(defaultQuery, args);
     };
-  }
+  });
   return pgClient;
 }
 
@@ -99,11 +99,17 @@ function roUrl(opts: DatabaseOptions): string {
 
 export default class PgClient extends EventEmitter {
   public baseClient: IDatabase<any>;
+
   public readonlyBaseClient?: IDatabase<any>;
+
   public pgClient: ProxiedPgClient;
+
   public interface?: any;
+
   public sqlFiles?: any;
+
   public db?: any;
+
   public options: Omit<DatabaseOptions, 'password'>;
 
   constructor(context: Context, opts: DatabaseOptions) {
@@ -140,10 +146,13 @@ export default class PgClient extends EventEmitter {
       if (context && context.logger && context.logger.info) {
         context.logger.info(`Creating SqlFiles for ${opts.sqlFilesDirectory}`);
       }
-      this.sqlFiles = (pgp as any).utils.enumSql(`${opts.sqlFilesDirectory}`, { recursive: true },
-        (file: string) => new (pgp as any).QueryFile(file));
+      this.sqlFiles = (pgp as any).utils.enumSql(
+        `${opts.sqlFilesDirectory}`,
+        { recursive: true },
+        (file: string) => new (pgp as any).QueryFile(file),
+      );
     }
-    this.options = Object.assign({}, opts);
+    this.options = { ...opts };
     delete (this.options as any).password;
   }
 

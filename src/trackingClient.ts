@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
-import type { IDatabase, IMain } from 'pg-promise';
+import type { IDatabase } from 'pg-promise';
 import type { EventEmitter } from 'events';
-import type { QueryContext, Logger } from './types';
+import type { QueryContext } from './types';
 
 interface CallInfo {
   client: any;
@@ -42,8 +42,11 @@ function strToKey(name: string): [number, number] {
 
 export default class TrackingClient {
   private configuredClient: ConfiguredClient;
+
   private queryContext: QueryContext;
+
   private operationName: string;
+
   private useReadOnly: boolean = false;
 
   constructor(pg: ConfiguredClient, queryContext: QueryContext, operationName: string) {
@@ -146,9 +149,9 @@ export default class TrackingClient {
   }
 
   /**
-   * Execute a function with a lock. The lock is unique across processes and within the current process as well
-   * since it holds a connection from the pool so long as it is running. Throws an exception if it cannot get the lock
-   * after timeout
+   * Execute a function with a lock. The lock is unique across processes and within the current
+   * process as well since it holds a connection from the pool so long as it is running.
+   * Throws an exception if it cannot get the lock after timeout
    *
    * @param key Will be SHA256-d to build a key.
    * @param fn The function to execute.
@@ -158,7 +161,7 @@ export default class TrackingClient {
   async withAdvisoryLock<T>(
     key: string,
     fn: (options?: AdvisoryLockOptions) => Promise<T>,
-    options: AdvisoryLockOptions = {}
+    options: AdvisoryLockOptions = {},
   ): Promise<T> {
     const [k1, k2] = strToKey(key);
     let result: T;
@@ -215,14 +218,17 @@ export default class TrackingClient {
     key: string,
     fn: (options?: AdvisoryLockOptions) => Promise<T>,
     delays: number[],
-    options: AdvisoryLockOptions = {}
+    options: AdvisoryLockOptions = {},
   ): Promise<T> {
     try {
       const lockResult = await this.withAdvisoryLock(key, fn, { ...options, immediate: true });
       return lockResult;
     } catch (error) {
       if ((error as any).code === 'AdvisoryLockBusy' && delays.length) {
-        await new Promise(accept => setTimeout(accept, delays[0]));
+        await new Promise<void>((accept) => {
+          setTimeout(accept, delays[0]);
+        });
+        // eslint-disable-next-line no-param-reassign
         options.retryCount = (options.retryCount || 0) + 1;
         return this.tryAdvisoryLock(key, fn, delays.slice(1), options);
       }
@@ -232,7 +238,7 @@ export default class TrackingClient {
 
   async createNotificationListener(
     notificationKey: string,
-    fn: (payload: any) => Promise<void>
+    fn: (payload: any) => Promise<void>,
   ): Promise<void> {
     if (notificationKey.match(/[^A-Za-z0-9_]/)) {
       throw new Error('Invalid notification key, only A-Za-z0-9_');
