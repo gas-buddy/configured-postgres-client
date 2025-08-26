@@ -24,7 +24,7 @@ interface DatabaseOptions {
   logQueries?: boolean;
 }
 
-interface ProxiedPgClient {
+export interface ProxiedPgClient {
   query(...args: any[]): any;
   queryWithContext(...args: any[]): any;
   connect(...args: any[]): any;
@@ -156,7 +156,7 @@ export default class PgClient extends EventEmitter {
     delete (this.options as any).password;
   }
 
-  start(context: Context): any {
+  start(context: Context): ProxiedPgClient | any {
     assert(!this.db, 'start called multiple times on configured-postgres-client instance');
     if (this.interface) {
       const ClassConstructor = this.interface;
