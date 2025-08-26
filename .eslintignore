@@ -3,3 +3,4 @@ build/
 .wercker
 coverage/
 .nyc_output/
+jest.config.js
